@@ -39,22 +39,23 @@ public class UserService
 
     public ResponseUserDTO registerNewUser( RequestUserDTO newUser ) throws DuplicateEntryForUniqueDBRecord
     {
-        if( newUser == null ) throw new IllegalArgumentException( "Missing user object!" );
+        if( newUser == null ) throw new IllegalArgumentException( "Missing User object!" );
         if( isMissingMandatoryUserData( newUser ) ) throw new IllegalArgumentException( "User mandatory data missing." );
 
         UserDTO addedUser = userDAO.addUser( UserConverter.fromRequestDTOtoDTO( newUser ) );
 
-        return UserConverter.fromDTOtoResponseDTO( addedUser );
+        if( addedUser != null ) { return UserConverter.fromDTOtoResponseDTO( addedUser ); }
+        else { return null; }
     }
 
 
     private boolean isMissingMandatoryUserData( RequestUserDTO newUser )
     {
         return newUser.getUsername() == null || newUser.getUsername().length() == 0
-                || newUser.getPassword() == null || newUser.getPassword().length() == 0
-                || newUser.getEmail() == null || newUser.getEmail().length() == 0
-                || newUser.getFirstName() == null || newUser.getFirstName().length() == 0
-                || newUser.getLastName() == null || newUser.getLastName().length() == 0;
+               || newUser.getPassword() == null || newUser.getPassword().length() == 0
+               || newUser.getEmail() == null || newUser.getEmail().length() == 0
+               || newUser.getFirstName() == null || newUser.getFirstName().length() == 0
+               || newUser.getLastName() == null || newUser.getLastName().length() == 0;
     }
 
 

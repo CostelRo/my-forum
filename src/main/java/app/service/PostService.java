@@ -36,12 +36,13 @@ public class PostService
 
     public ResponsePostDTO registerNewPost( int activeUserId, RequestPostDTO newPost )
     {
-        if( newPost == null ) throw new IllegalArgumentException( "Missing post object." );
+        if( newPost == null ) throw new IllegalArgumentException( "Missing Post object." );
         if( activeUserId <= 0 ) throw new IllegalArgumentException( "Incorrect active user ID." );
 
-        PostDTO addedPost = postDAO.addPost( PostConverter.fromRequestDTOtoDTO( activeUserId, newPost ) );
+        PostDTO result = postDAO.addPost( PostConverter.fromRequestDTOtoDTO( activeUserId, newPost ) );
 
-        return PostConverter.fromDTOtoResponseDTO( addedPost );
+        if( result != null ) { return PostConverter.fromDTOtoResponseDTO( result ); }
+        else { return null; }
     }
 
 

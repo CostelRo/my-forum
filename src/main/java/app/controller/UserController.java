@@ -46,7 +46,9 @@ public class UserController
 
         ResponseUserDTO insertedUser = userService.registerNewUser( newUser );
 
-        return new ResponseEntity<>( insertedUser, HttpStatus.CREATED );
+        return new ResponseEntity<>( insertedUser, ( insertedUser != null )
+                                                     ? HttpStatus.CREATED
+                                                     : HttpStatus.NOT_FOUND );
     }
 
 

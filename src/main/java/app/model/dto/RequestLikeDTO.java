@@ -1,32 +1,21 @@
 package app.model.dto;
 
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 
 public class RequestLikeDTO
 {
-    @NotNull
-    private int userId;
-
-    @NotNull
+    @Positive
     private int postId;
 
 
     public RequestLikeDTO() {}
 
 
-    public RequestLikeDTO( @NotNull int userId,
-                           @NotNull int postId )
+    public RequestLikeDTO( @Positive int postId )
     {
-        this.userId = userId;
         this.postId = postId;
-    }
-
-
-    public int getUserId()
-    {
-        return userId;
     }
 
 
@@ -39,6 +28,6 @@ public class RequestLikeDTO
     @Override
     public String toString()
     {
-        return "by " + userId;
+        return "Like for post #" + postId;
     }
 }

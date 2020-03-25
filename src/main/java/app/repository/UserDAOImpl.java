@@ -315,7 +315,7 @@ public class UserDAOImpl implements UserDAO
     public int followUser( int activeUserId, int followedId )
                            throws UserNotFound, IllegalArgumentException
     {
-        // only pre-existing IDs are allowed by database
+        // the database only allows the use of pre-existing user IDs
         final String query = "INSERT INTO followers (user_id, followed_user_id ) VALUES (?, ?)";
 
         try( Connection conn = MySQLConnection.getConnection();

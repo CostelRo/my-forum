@@ -2,34 +2,30 @@ package app.model.dto;
 
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.List;
 
 
 public class ResponseReplyDTO extends ResponsePostDTO
 {
-    @NotNull
+    @Positive
     private int parentPostId;
-
-    @NotNull
-    private boolean isPublic;
 
 
     public ResponseReplyDTO() {}
 
 
-    public ResponseReplyDTO( @NotNull int id,
-                             @NotNull int authorID,
+    public ResponseReplyDTO( @Positive int id,
+                             @Positive int authorID,
                              @NotNull String message,
                              @NotNull LocalDateTime timestamp,
                              @NotNull List<ResponseReplyDTO> replies,
                              @NotNull List<ResponseLikeDTO> likes,
-                             @NotNull int parentPostId,
-                             @NotNull boolean isPublic )
+                             @Positive int parentPostId )
     {
         super( id, authorID, message, timestamp, replies, likes );
         this.parentPostId = parentPostId;
-        this.isPublic = isPublic;
     }
 
 
@@ -72,12 +68,6 @@ public class ResponseReplyDTO extends ResponsePostDTO
     public int getParentPostId()
     {
         return parentPostId;
-    }
-
-
-    public boolean isPublic()
-    {
-        return isPublic;
     }
 
 

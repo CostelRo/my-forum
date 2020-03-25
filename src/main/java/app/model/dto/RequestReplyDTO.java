@@ -2,29 +2,23 @@ package app.model.dto;
 
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 
 public class RequestReplyDTO extends RequestPostDTO
 {
-    /* Author ID will be sent through the POST Request header; security to be implemented later. */
-
-    @NotNull
+    @Positive
     private int parentPostId;
-
-    @NotNull
-    private boolean isPublic;
 
 
     public RequestReplyDTO() {}
 
 
     public RequestReplyDTO( @NotNull String message,
-                            @NotNull int parentPostId,
-                            @NotNull boolean isPublic )
+                            @Positive int parentPostId )
     {
         super( message );
         this.parentPostId = parentPostId;
-        this.isPublic = isPublic;
     }
 
 
@@ -37,12 +31,6 @@ public class RequestReplyDTO extends RequestPostDTO
     public int getParentPostId()
     {
         return parentPostId;
-    }
-
-
-    public boolean isPublic()
-    {
-        return isPublic;
     }
 
 

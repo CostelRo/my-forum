@@ -42,7 +42,9 @@ public class PostController
     {
         ResponsePostDTO insertedPost = postService.registerNewPost( activeUserId, newPost );
 
-        return new ResponseEntity<>( insertedPost, HttpStatus.CREATED );
+        return new ResponseEntity<>( insertedPost, ( insertedPost != null )
+                                                     ? HttpStatus.CREATED
+                                                     : HttpStatus.NOT_FOUND );
     }
 
 

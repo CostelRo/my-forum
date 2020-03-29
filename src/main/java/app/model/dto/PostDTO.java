@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-public class PostDTO
+public class PostDTO implements Comparable<PostDTO>
 {
     /* Author ID will be sent through the POST Request header; security to be implemented later. */
 
@@ -28,7 +28,7 @@ public class PostDTO
     private List<ReplyDTO> replies;
 
     @NotNull
-    private List<LikeDTO> likes;
+    private List<String> likes;    // usernames
 
 
     public PostDTO() {}
@@ -39,7 +39,7 @@ public class PostDTO
                     @NotNull String message,
                     @NotNull LocalDateTime timestamp,
                     @NotNull List<ReplyDTO> replies,
-                    @NotNull List<LikeDTO> likes )
+                    @NotNull List<String> likes )
     {
         this.id = id;
         this.authorID = authorID;
@@ -80,9 +80,21 @@ public class PostDTO
     }
 
 
-    public List<LikeDTO> getLikes()
+    public List<String> getLikes()
     {
         return likes;
+    }
+
+
+    public void setReplies( List<ReplyDTO> replies )
+    {
+        this.replies = replies;
+    }
+
+
+    public void setLikes( List<String> likes )
+    {
+        this.likes = likes;
     }
 
 
@@ -106,6 +118,15 @@ public class PostDTO
     @Override
     public String toString()
     {
-        return "[post #" + id + " by " + authorID +", on " + timestamp + "]\n" + message;
+        return "Post #" + id + " by user #" + authorID +", on " + timestamp + "\n" + message;
+    }
+
+
+    @Override
+    public int compareTo( PostDTO other )
+    {
+        if( other == null ) return 1;
+
+        return this.id - other.id;
     }
 }

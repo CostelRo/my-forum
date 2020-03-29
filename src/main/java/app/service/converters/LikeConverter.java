@@ -4,6 +4,7 @@ package app.service.converters;
 import app.model.dto.LikeDTO;
 import app.model.dto.ResponseLikeDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -23,6 +24,16 @@ public class LikeConverter
 
     public static List<ResponseLikeDTO> fromListOfDTOtoListOfResponseDTO( List<LikeDTO> likes )
     {
-        return null;
+        List<ResponseLikeDTO> result = new ArrayList<>();
+
+        for( LikeDTO like : likes )
+        {
+            if( like != null )
+            {
+                result.add( new ResponseLikeDTO( like.getUserId(), like.getPostId() ) );
+            }
+        }
+
+        return result;
     }
 }

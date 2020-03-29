@@ -34,28 +34,6 @@ public class RequestReplyDTO extends RequestPostDTO
     }
 
 
-//    @Override
-//    public boolean equals( Object obj )
-//    {
-//        if( obj == null || !(obj instanceof RequestReplyDTO) ) return false;
-//
-//        RequestReplyDTO other = (RequestReplyDTO) obj;
-//        return super.getTimestamp().equals( other.getTimestamp() );
-//    }
-
-
-//    @Override
-//    public int hashCode()
-//    {
-//        return super.getTimestamp().hashCode();
-//    }
-
-
-//    @Override
-//    public String toString()
-//    {
-//        return "(" + super.getTimestamp() + ") " + super.getMessage();
-//    }
     public String toString()
     {
         return super.getMessage();

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-public class ResponsePostDTO
+public class ResponsePostDTO implements Comparable<ResponsePostDTO>
 {
     @Positive
     private int id;
@@ -26,7 +26,7 @@ public class ResponsePostDTO
     private List<ResponseReplyDTO> replies;
 
     @NotNull
-    private List<ResponseLikeDTO> likes;
+    private List<String> likes;    // usernames
 
 
     public ResponsePostDTO() {}
@@ -37,7 +37,7 @@ public class ResponsePostDTO
                             @NotNull String message,
                             @NotNull LocalDateTime timestamp,
                             @NotNull List<ResponseReplyDTO> replies,
-                            @NotNull List<ResponseLikeDTO> likes )
+                            @NotNull List<String> likes )
     {
         this.id = id;
         this.authorID = authorID;
@@ -78,7 +78,7 @@ public class ResponsePostDTO
     }
 
 
-    public List<ResponseLikeDTO> getLikes()
+    public List<String> getLikes()
     {
         return likes;
     }
@@ -104,6 +104,15 @@ public class ResponsePostDTO
     @Override
     public String toString()
     {
-        return "[post #" + id + " by " + authorID +", on " + timestamp + "]\n" + message;
+        return "Post #" + id + " by user #" + authorID +", on " + timestamp + "\n" + message;
+    }
+
+
+    @Override
+    public int compareTo( ResponsePostDTO other )
+    {
+        if( other == null ) return 1;
+
+        return this.id - other.id;
     }
 }

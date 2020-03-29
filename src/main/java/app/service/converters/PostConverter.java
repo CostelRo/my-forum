@@ -2,8 +2,10 @@ package app.service.converters;
 
 
 import app.model.dto.PostDTO;
+import app.model.dto.ReplyDTO;
 import app.model.dto.RequestPostDTO;
 import app.model.dto.ResponsePostDTO;
+import app.model.dto.ResponseReplyDTO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,7 +36,8 @@ public class PostConverter
                                     post.getMessage(),
                                     post.getTimestamp(),
                                     ReplyConverter.fromListOfDTOtoListOfResponseDTO( post.getReplies() ),
-                                    LikeConverter.fromListOfDTOtoListOfResponseDTO( post.getLikes() ) );
+                                    post.getLikes() );
+//                                    LikeConverter.fromListOfDTOtoListOfResponseDTO( post.getLikes() ) );
     }
 
 
@@ -54,23 +57,38 @@ public class PostConverter
     }
 
 
-    public static List<ResponsePostDTO> fromListOfDTOtoListOfResponseDTO( List<PostDTO> ownPosts )
+    public static List<ResponsePostDTO> fromListOfDTOtoListOfResponseDTO( List<PostDTO> posts )
     {
         List<ResponsePostDTO> result = new ArrayList<>();
 
-        for( PostDTO post : ownPosts )
+        for( PostDTO post : posts )
         {
             if( post != null )
             {
-                result.add( new ResponsePostDTO( post.getId(),
-                                                 post.getAuthorID(),
-                                                 post.getMessage(),
-                                                 post.getTimestamp(),
-                                                 new ArrayList<>(  ),
-                                                 new ArrayList<>(  ) ) );
-//                                                 post.ReplyConverter.fromListOfDTOtoListOfResponseDTO( post.getReplies() ),
-//                                                 post.LikeConverter.fromListOfDTOtoListOfResponseDTO( post.getLikes() ) ) );
-                // TODO insert list of ReplyDTO and LikeDTO, from their DAOImpl
+                if( post instanceof ReplyDTO )
+                {
+                    ReplyDTO reply = (ReplyDTO) post;
+
+                    result.add( new ResponseReplyDTO( reply.getID(),
+                                                      reply.getAuthorID(),
+                                                      reply.getMessage(),
+                                                      reply.getTimestamp(),
+                                                      ReplyConverter.fromListOfDTOtoListOfResponseDTO( reply.getReplies() ),
+                                                      post.getLikes(),
+//                                                      LikeConverter.fromListOfDTOtoListOfResponseDTO ( reply.getLikes() ),
+                                                      reply.getParentPostId() ) );
+                    // TODO add replies & likes!
+                }
+                else
+                {
+                    result.add( new ResponsePostDTO( post.getId(),
+                                                     post.getAuthorID(),
+                                                     post.getMessage(),
+                                                     post.getTimestamp(),
+                                                     ReplyConverter.fromListOfDTOtoListOfResponseDTO( post.getReplies() ),
+                                                     post.getLikes() ) );
+//                                                     LikeConverter.fromListOfDTOtoListOfResponseDTO( post.getLikes() ) ) );
+                }
             }
         }
 

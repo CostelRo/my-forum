@@ -21,9 +21,6 @@ public class LikeDAOImpl implements LikeDAO
         LikeDTO result = null;
 
         // authors cannot add a like to their own posts
-//        final String query = "INSERT INTO likes (user_id, post_id) "
-//                             + "SELECT ?, ? "
-//                             + "WHERE NOT EXISTS (SELECT author_id, id FROM posts WHERE author_id = ? AND id = ?)";
         final String query = "INSERT INTO likes (user_id, post_id) "
                              + "SELECT ?, ? "
                              + "WHERE ? IN (SELECT id FROM users) AND ? IN (SELECT id FROM posts) "

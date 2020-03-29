@@ -54,14 +54,22 @@ public class PostController
                                                        @DateTimeFormat( iso = DateTimeFormat.ISO.DATE_TIME )
                                                        LocalDateTime timestamp )
     {
-        return new ResponseEntity<>( postService.getOwnPosts( activeUserId, timestamp ), HttpStatus.OK );
+        List<ResponsePostDTO> ownPosts = postService.getOwnPosts( activeUserId, timestamp );
+
+        return new ResponseEntity<>( ownPosts, ( ownPosts != null )
+                                                 ? HttpStatus.OK
+                                                 : HttpStatus.NOT_FOUND );
     }
 
 
     @RequestMapping( value ="/feed/", method = RequestMethod.GET, produces = "application/json" )
     ResponseEntity<List<ResponsePostDTO>> getFeed( @RequestHeader @Positive int activeUserId )
     {
-        return new ResponseEntity<>( postService.getFeed( activeUserId ), HttpStatus.OK );
+        List<ResponsePostDTO> feed = postService.getFeed( activeUserId );
+
+        return new ResponseEntity<>( feed, ( feed != null )
+                                             ? HttpStatus.OK
+                                             : HttpStatus.NOT_FOUND );
     }
 
 

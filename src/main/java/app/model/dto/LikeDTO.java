@@ -39,6 +39,6 @@ public class LikeDTO
     @Override
     public String toString()
     {
-        return "Like for post #" + postId + " by user #" + userId;
+        return "Post #" + postId + " liked by user #" + userId;
     }
 }

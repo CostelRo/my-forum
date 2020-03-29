@@ -21,7 +21,7 @@ public class ResponseReplyDTO extends ResponsePostDTO
                              @NotNull String message,
                              @NotNull LocalDateTime timestamp,
                              @NotNull List<ResponseReplyDTO> replies,
-                             @NotNull List<ResponseLikeDTO> likes,
+                             @NotNull List<String> likes,
                              @Positive int parentPostId )
     {
         super( id, authorID, message, timestamp, replies, likes );
@@ -59,7 +59,7 @@ public class ResponseReplyDTO extends ResponsePostDTO
     }
 
 
-    public List<ResponseLikeDTO> getLikes()
+    public List<String> getLikes()
     {
         return super.getLikes();
     }
@@ -74,7 +74,8 @@ public class ResponseReplyDTO extends ResponsePostDTO
     @Override
     public String toString()
     {
-        return "[post #" + super.getId() + " by " + super.getAuthorID() +", from " + super.getTimestamp() + "]\n"
-                + super.getMessage();
+        return "Post #" + super.getId() + " by user #" + super.getAuthorID()
+                + " (reply to post #" + this.getParentPostId() + ")" + super.getAuthorID()
+                + ", from " + super.getTimestamp() + "\n" + super.getMessage();
     }
 }

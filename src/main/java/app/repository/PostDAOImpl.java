@@ -5,7 +5,6 @@ import app.model.dto.PostDTO;
 import app.model.dto.ReplyDTO;
 import app.repository.api.PostDAO;
 import app.repository.dbconnection.MySQLConnection;
-
 import com.sun.rowset.CachedRowSetImpl;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +26,7 @@ import java.util.Map;
 public class PostDAOImpl implements PostDAO
 {
     @Override
-    public PostDTO addPost( PostDTO newPost )
+    public PostDTO addPost( PostDTO newPost ) throws SQLIntegrityConstraintViolationException
     {
         PostDTO result = null;
 
@@ -55,12 +55,16 @@ public class PostDAOImpl implements PostDAO
                                           rs.getInt( "author_id" ),
                                           rs.getString( "message" ),
                                           rs.getTimestamp( "timestamp" ).toLocalDateTime(),
-                                          new ArrayList<>(),        // new posts have no replies yet
-                                          new ArrayList<>() );      // new posts have no likes yet
+                                          new ArrayList<>(),                        // new posts have no replies yet
+                                          new ArrayList<>() );                      // new posts have no likes yet
                 }
 
                 rs.close();
             }
+        }
+        catch( SQLIntegrityConstraintViolationException sqlcvex )
+        {
+            throw sqlcvex;
         }
         catch( SQLException sqlex )
         {

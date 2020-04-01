@@ -5,7 +5,6 @@ import app.model.dto.RequestUserDTO;
 import app.model.dto.ResponseUserDTO;
 import app.repository.exceptions.ActiveUsersCannotFollowThemselves;
 import app.repository.exceptions.ActiveUsersCannotUnfollowThemselves;
-import app.repository.exceptions.DuplicateEntryForUniqueDBRecord;
 import app.repository.exceptions.UserNotFound;
 import app.service.UserService;
 
@@ -19,8 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 
@@ -39,16 +41,12 @@ public class UserController
 
 
     @RequestMapping( value = "/", method = RequestMethod.POST, consumes = "application/json" )
-    ResponseEntity<ResponseUserDTO> registerUser( @RequestBody @NotNull RequestUserDTO newUser )
-                                                  throws DuplicateEntryForUniqueDBRecord
+    ResponseEntity<Object> registerUser( @Valid @RequestBody @NotNull RequestUserDTO newUser )
+                                        throws SQLIntegrityConstraintViolationException
     {
-        // TODO use security EVERYWHERE: now, the active-user ID is sent through the request header
-
         ResponseUserDTO insertedUser = userService.registerNewUser( newUser );
-
-        return new ResponseEntity<>( insertedUser, ( insertedUser != null )
-                                                     ? HttpStatus.CREATED
-                                                     : HttpStatus.NOT_FOUND );
+        return new ResponseEntity<>( insertedUser, ( insertedUser != null ) ? HttpStatus.CREATED
+                                                                            : HttpStatus.NOT_FOUND );
     }
 
 
@@ -60,31 +58,41 @@ public class UserController
 
 
     @RequestMapping( value = "/{name}/", method = RequestMethod.GET, produces = "application/json" )
-    public ResponseEntity<List<ResponseUserDTO>> getUserByName( @PathVariable @NotNull String name )
+    public ResponseEntity<List<ResponseUserDTO>> getUserByName( @Valid @PathVariable @NotEmpty String name )
     {
         return new ResponseEntity<>( userService.searchByName( name ), HttpStatus.OK );
     }
 
 
-    @RequestMapping( value = "/follow/{followedId}/", method = RequestMethod.PUT, consumes = "application/json" )
-    public ResponseEntity<Integer> followUser( @RequestHeader @Positive int activeUserId,
-                                               @PathVariable @Positive int followedId )
-                                               throws UserNotFound, ActiveUsersCannotFollowThemselves
+    @RequestMapping( value = "/follow/{followedId}/", method = RequestMethod.POST, consumes = "application/json" )
+    public ResponseEntity<Object> followUser( @Valid @RequestHeader @Positive int activeUserId,
+                                              @Valid @PathVariable @Positive int followedId )
+                                              throws SQLIntegrityConstraintViolationException
     {
-        int followedUserId = userService.followUser( activeUserId, followedId );
-
-        return new ResponseEntity<>( followedUserId, HttpStatus.CREATED );
+        try
+        {
+            int followedUserId = userService.followUser( activeUserId, followedId );
+            return new ResponseEntity<>( followedUserId, HttpStatus.CREATED );
+        }
+        catch( UserNotFound | ActiveUsersCannotFollowThemselves ex )
+        {
+            return new ResponseEntity<>( ex.getMessage(), HttpStatus.FORBIDDEN );
+        }
     }
 
 
     @RequestMapping( value = "/unfollow/{unfollowedId}/", method = RequestMethod.DELETE, consumes = "application/json" )
-    public ResponseEntity<Integer> unfollowUser( @RequestHeader @Positive int activeUserId,
-                                                 @PathVariable @Positive int unfollowedId )
-                                                 throws ActiveUsersCannotUnfollowThemselves
+    public ResponseEntity<Object> unfollowUser( @Valid @RequestHeader @Positive int activeUserId,
+                                                @Valid @PathVariable @Positive int unfollowedId )
     {
-        int result = userService.unfollowUser( activeUserId, unfollowedId );
-
-        return new ResponseEntity<>( result, HttpStatus.NO_CONTENT );
+        try
+        {
+            int result = userService.unfollowUser( activeUserId, unfollowedId );
+            return new ResponseEntity<>( result, HttpStatus.NO_CONTENT );
+        }
+        catch( ActiveUsersCannotUnfollowThemselves ex )
+        {
+            return new ResponseEntity<>( ex.getMessage(), HttpStatus.FORBIDDEN );
+        }
     }
 }
-

@@ -63,8 +63,6 @@ public class UserConverter
         {
             for( UserDTO user : usersList )
             {
-                System.out.println( ">> user: " + user );
-
                 if( user != null ) { result.add( fromDTOtoResponseDTO( user ) ); }
             }
         }

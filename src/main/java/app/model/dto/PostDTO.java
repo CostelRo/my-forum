@@ -1,45 +1,29 @@
 package app.model.dto;
 
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
 
 public class PostDTO implements Comparable<PostDTO>
 {
-    /* Author ID will be sent through the POST Request header; security to be implemented later. */
-
-    @Positive
     private int id;
-
-    @PositiveOrZero
     private int authorID;
-
-    @NotNull
     private String message;
-
-    @NotNull
     private LocalDateTime timestamp;
-
-    @NotNull
     private List<ReplyDTO> replies;
-
-    @NotNull
     private List<String> likes;    // usernames
 
 
     public PostDTO() {}
 
 
-    public PostDTO( @Positive int id,
-                    @PositiveOrZero int authorID,
-                    @NotNull String message,
-                    @NotNull LocalDateTime timestamp,
-                    @NotNull List<ReplyDTO> replies,
-                    @NotNull List<String> likes )
+    public PostDTO( int id,
+                    int authorID,
+                    String message,
+                    LocalDateTime timestamp,
+                    List<ReplyDTO> replies,
+                    List<String> likes )
     {
         this.id = id;
         this.authorID = authorID;

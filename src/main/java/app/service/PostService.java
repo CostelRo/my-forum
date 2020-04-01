@@ -10,6 +10,7 @@ import app.service.converters.PostConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,6 +36,7 @@ public class PostService
 
 
     public ResponsePostDTO registerNewPost( int activeUserId, RequestPostDTO newPost )
+                                            throws SQLIntegrityConstraintViolationException
     {
         if( newPost == null ) throw new IllegalArgumentException( "Missing Post object." );
         if( activeUserId <= 0 ) throw new IllegalArgumentException( "Incorrect active user ID." );

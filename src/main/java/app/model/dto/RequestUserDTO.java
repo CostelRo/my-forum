@@ -2,36 +2,39 @@ package app.model.dto;
 
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 
 public class RequestUserDTO
 {
-    @NotNull
+    @NotEmpty( message = "The Username must be provided." )
+    @Size( min = 8, max = 20, message = "Username must be between {min} and {max} characters." )
     private String username;
 
-    @NotNull
+    @NotEmpty( message = "The Password must be provided." )
+    @Size( min = 8, max = 20, message = "Password must be between {min} and {max} characters." )
     private String password;
 
-    @NotNull
-    @Email
+    @NotEmpty( message = "The Email must be provided." )
+    @Email( message = "A valid Email format must be used." )
     private String email;
 
-    @NotNull
+    @NotEmpty( message = "The First Name must be provided." )
     private String firstName;
 
-    @NotNull
+    @NotEmpty( message = "The Last Name must be provided." )
     private String lastName;
 
 
     public RequestUserDTO() {}
 
 
-    public RequestUserDTO( @NotNull String username,
-                           @NotNull String password,
-                           @NotNull @Email String email,
-                           @NotNull String firstName,
-                           @NotNull String lastName )
+    public RequestUserDTO( String username,
+                           String password,
+                           String email,
+                           String firstName,
+                           String lastName )
     {
         this.username = username;
         this.password = password;

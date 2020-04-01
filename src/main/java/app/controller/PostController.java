@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,45 +39,43 @@ public class PostController
 
 
     @RequestMapping( value = "/", method = RequestMethod.POST, consumes = "application/json" )
-    ResponseEntity<ResponsePostDTO> addPost( @RequestHeader @Positive int activeUserId,
-                                             @RequestBody @NotNull RequestPostDTO newPost )
+    ResponseEntity<Object> addPost( @Valid @RequestHeader @Positive int activeUserId,
+                                    @Valid @RequestBody @NotNull RequestPostDTO newPost )
+                                    throws SQLIntegrityConstraintViolationException
     {
         ResponsePostDTO insertedPost = postService.registerNewPost( activeUserId, newPost );
 
-        return new ResponseEntity<>( insertedPost, ( insertedPost != null )
-                                                     ? HttpStatus.CREATED
-                                                     : HttpStatus.NOT_FOUND );
+        return new ResponseEntity<>( insertedPost, ( insertedPost != null ) ? HttpStatus.CREATED
+                                                                            : HttpStatus.NOT_FOUND );
     }
 
 
     @RequestMapping( value = "/", method = RequestMethod.GET, produces = "application/json" )
-    ResponseEntity<List<ResponsePostDTO>> getOwnPosts( @RequestHeader @Positive int activeUserId,
-                                                       @RequestHeader( required = false )
-                                                       @DateTimeFormat( iso = DateTimeFormat.ISO.DATE_TIME )
-                                                       LocalDateTime timestamp )
+    ResponseEntity<List<ResponsePostDTO>> getOwnPosts( @Valid @RequestHeader @Positive int activeUserId,
+                                                       @Valid @RequestHeader( required = false )
+                                                              @DateTimeFormat( iso = DateTimeFormat.ISO.DATE_TIME )
+                                                              LocalDateTime timestamp )
     {
         List<ResponsePostDTO> ownPosts = postService.getOwnPosts( activeUserId, timestamp );
 
-        return new ResponseEntity<>( ownPosts, ( ownPosts != null )
-                                                 ? HttpStatus.OK
-                                                 : HttpStatus.NOT_FOUND );
+        return new ResponseEntity<>( ownPosts, ( ownPosts != null ) ? HttpStatus.OK
+                                                                    : HttpStatus.NOT_FOUND );
     }
 
 
     @RequestMapping( value ="/feed/", method = RequestMethod.GET, produces = "application/json" )
-    ResponseEntity<List<ResponsePostDTO>> getFeed( @RequestHeader @Positive int activeUserId )
+    ResponseEntity<List<ResponsePostDTO>> getFeed( @Valid @RequestHeader @Positive int activeUserId )
     {
         List<ResponsePostDTO> feed = postService.getFeed( activeUserId );
 
-        return new ResponseEntity<>( feed, ( feed != null )
-                                             ? HttpStatus.OK
-                                             : HttpStatus.NOT_FOUND );
+        return new ResponseEntity<>( feed, ( feed != null ) ? HttpStatus.OK
+                                                            : HttpStatus.NOT_FOUND );
     }
 
 
     @RequestMapping( value = "/{postId}/", method = RequestMethod.DELETE, consumes = "application/json" )
-    public ResponseEntity<Integer> deletePost( @RequestHeader @Positive int activeUserId,
-                                               @PathVariable @Positive int postId )
+    public ResponseEntity<Integer> deletePost( @Valid @RequestHeader @Positive int activeUserId,
+                                               @Valid @PathVariable @Positive int postId )
     {
         int result = postService.deletePost( activeUserId, postId );
 

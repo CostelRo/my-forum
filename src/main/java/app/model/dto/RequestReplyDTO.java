@@ -1,7 +1,6 @@
 package app.model.dto;
 
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 
@@ -14,8 +13,8 @@ public class RequestReplyDTO extends RequestPostDTO
     public RequestReplyDTO() {}
 
 
-    public RequestReplyDTO( @NotNull String message,
-                            @Positive int parentPostId )
+    public RequestReplyDTO( String message,
+                            int parentPostId )
     {
         super( message );
         this.parentPostId = parentPostId;

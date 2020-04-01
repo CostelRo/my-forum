@@ -5,8 +5,6 @@ import app.model.dto.PostDTO;
 import app.model.dto.UserDTO;
 import app.repository.api.UserDAO;
 import app.repository.dbconnection.MySQLConnection;
-import app.repository.exceptions.DuplicateEntryForUniqueDBRecord;
-import app.repository.exceptions.UserNotFound;
 
 import org.springframework.stereotype.Repository;
 
@@ -23,7 +21,7 @@ import java.util.List;
 public class UserDAOImpl implements UserDAO
 {
     @Override
-    public UserDTO addUser( UserDTO newUser ) throws DuplicateEntryForUniqueDBRecord
+    public UserDTO addUser( UserDTO newUser ) throws SQLIntegrityConstraintViolationException
     {
         final String query = "INSERT INTO users (first_name, last_name, email, username, password) VALUES (?, ?, ?, ?, ?)";
 
@@ -40,7 +38,7 @@ public class UserDAOImpl implements UserDAO
         }
         catch( SQLIntegrityConstraintViolationException icvex )
         {
-            throw new DuplicateEntryForUniqueDBRecord( "Unique data is already used by another user." );
+            throw new SQLIntegrityConstraintViolationException( "Unique data is already used by another user." );
         }
         catch( SQLException sqlex )
         {
@@ -80,7 +78,8 @@ public class UserDAOImpl implements UserDAO
 
         if( username != null && username.length() > 0 )
         {
-            if( isNewUser )    // new users can only have very little data in database
+            // (1) get data on new users, which can only have very little data in the database
+            if( isNewUser )
             {
                 final String queryNewUserData = "SELECT id, first_name, last_name, email, username FROM users "
                                                 + "WHERE username = ?";
@@ -100,7 +99,7 @@ public class UserDAOImpl implements UserDAO
                     sqlex.printStackTrace();
                 }
             }
-            else    // old users might have a lot of data in database
+            else    // (2) get data on old users, which usually have a lot of data in the database
             {
                 final String queryUserMainData = "SELECT u.id, u.first_name, u.last_name, u.email, u.username, "
                                                     + "p.id postID, p.message, p.timestamp, p.parent_post_id "
@@ -117,35 +116,19 @@ public class UserDAOImpl implements UserDAO
                                                     + "ON u.id = j.followed_user_id "
                                                     + "ORDER BY followedUsername";
 
-                /*
-                 * queries for searching multiple users + their messages & followed users (if >1 username, not just "?")
-
-                final String queryUserMainData = "SELECT u.id userID, u.first_name, u.last_name, u.email, u.username, "
-                                             + "p.id postID, p.message, p.timestamp, p.parent_post_id, "
-                                             + "FROM users u "
-                                             + "JOIN posts p ON userID = p.author_id "
-                                             + "WHERE u.username = ? "
-                                             + "ORDER BY userID, postID";
-
-                final String queryFollowedUsers = "SELECT j.username followingUsername, u.username followedUsername "
-                                                  + "FROM users u JOIN "
-                                                                  + "(SELECT u.username, f.followed_user_id "
-                                                                  + "FROM users u JOIN followers f ON u.id = f.user_id "
-                                                                  + "WHERE u.username = ?) j "
-                                                  + "ON u.id = j.followed_user_id "
-                                                  + "ORDER BY followingUsername, followedUsername";
-                  */
-
                 try ( Connection conn = MySQLConnection.getConnection();
                       PreparedStatement pstmtUserMainData = conn.prepareStatement( queryUserMainData );
                       PreparedStatement pstmtFollowedUsers = conn.prepareStatement( queryFollowedUsers ) )
                 {
+                    // get main user data, except followed-users
                     pstmtUserMainData.setString( 1, username );
                     ResultSet rsUserMainData = pstmtUserMainData.executeQuery();
 
+                    // get data on users followed by current user
                     pstmtFollowedUsers.setString( 1, username );
                     ResultSet rsFollowedUsers = pstmtFollowedUsers.executeQuery();
 
+                    // insert followed users data into the current user object
                     result = createUserDTOfromResultSets( rsUserMainData, rsFollowedUsers, false );
 
                     rsUserMainData.close();
@@ -182,17 +165,14 @@ public class UserDAOImpl implements UserDAO
         try( Connection conn = MySQLConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement( query ) )
         {
-            pstmt.setString( 1, "\"%" + name + "%\"" );
-            pstmt.setString( 2, "\"%" + name + "%\"" );
-            pstmt.setString( 3, "\"%" + name + "%\"" );
+            String nameTemplate = "%" + name + "%";
+            pstmt.setString( 1, nameTemplate );
+            pstmt.setString( 2, nameTemplate );
+            pstmt.setString( 3, nameTemplate );
 
             ResultSet rs = pstmt.executeQuery();
 
             result = createListOfUserDTOfromResultSets( rs );
-
-            // check if Result Set actually contains any rows/records received from database
-//            if( rs.isBeforeFirst() ) { System.out.println( ">> We found data with UserDAO!" ); }
-//            System.out.println( ">> found # users with \"" + name + "\": " + result.size() );
 
             rs.close();
         }
@@ -206,8 +186,8 @@ public class UserDAOImpl implements UserDAO
 
 
     /*
-     * This method creates a UserDTO with all their data (identification, posts & likes, followed-users).
-     * The user passwords are hidden by default (they are never extracted from the database).
+     * This method creates a UserDTO.
+     * The user password is hidden by default (it is not even extracted from the database).
      */
     private UserDTO createUserDTOfromResultSets( ResultSet rsUserMainData,
                                                  ResultSet rsFollowedUsers,
@@ -247,8 +227,6 @@ public class UserDAOImpl implements UserDAO
                                                     rsUserMainData.getTimestamp( "timestamp" ).toLocalDateTime(),
                                                     new ArrayList<>(),
                                                     new ArrayList<>() );
-                    // TODO add Replies & Likes using ReplyDAO & LikeDAO, except for new users!
-
                     posts.add( userPost );
                 }
             }
@@ -295,8 +273,6 @@ public class UserDAOImpl implements UserDAO
                                              rs.getString( "last_name" ),
                                              new ArrayList<>(),
                                              new ArrayList<>() ) );
-                    // TODO add Posts & Follows using PostDAO, except for new users!
-
                 }
 
                 rs.close();
@@ -313,7 +289,7 @@ public class UserDAOImpl implements UserDAO
 
     @Override
     public int followUser( int activeUserId, int followedId )
-                           throws UserNotFound, IllegalArgumentException
+                           throws SQLIntegrityConstraintViolationException
     {
         // the database only allows the use of pre-existing user IDs
         final String query = "INSERT INTO followers (user_id, followed_user_id ) VALUES (?, ?)";
@@ -325,6 +301,10 @@ public class UserDAOImpl implements UserDAO
             pstmt.setInt( 2, followedId );
 
             pstmt.executeUpdate();
+        }
+        catch( SQLIntegrityConstraintViolationException sqlicvex )
+        {
+            throw sqlicvex;
         }
         catch( SQLException sqlex )
         {

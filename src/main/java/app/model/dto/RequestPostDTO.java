@@ -1,21 +1,21 @@
 package app.model.dto;
 
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 
 
 public class RequestPostDTO
 {
     /* Author ID will be sent through the POST Request header; security to be implemented later. */
 
-    @NotNull
+    @NotEmpty( message = "The Message must be provided." )
     private String message;
 
 
     public RequestPostDTO() {}
 
 
-    public RequestPostDTO( @NotNull String message )
+    public RequestPostDTO( String message )
     {
         this.message = message;
     }

@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 
 
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 public class ReplyDAOImpl implements ReplyDAO
 {
     @Override
-    public ReplyDTO addReply( ReplyDTO newReply )
+    public ReplyDTO addReply( ReplyDTO newReply ) throws SQLIntegrityConstraintViolationException
     {
         ReplyDTO result = null;
 
@@ -45,17 +46,17 @@ public class ReplyDAOImpl implements ReplyDAO
                                        rs.getInt( "author_id" ),
                                        rs.getString( "message" ),
                                        rs.getTimestamp( "timestamp" ).toLocalDateTime(),
-                                       new ArrayList<>(),
-                                       new ArrayList<>(),
+                                       new ArrayList<>(),                           // new replies have no replies yet
+                                       new ArrayList<>(),                           // new replies have no likes yet
                                        rs.getInt( "parent_post_id" ) );
             }
 
             rs.close();
         }
-//        catch( SQLIntegrityConstraintViolationException sqlicvex )
-//        {
-//            sqlicvex.printStackTrace();
-//        }
+        catch( SQLIntegrityConstraintViolationException sqlicvex )
+        {
+            throw sqlicvex;
+        }
         catch( SQLException sqlex )
         {
             sqlex.printStackTrace();
@@ -63,55 +64,4 @@ public class ReplyDAOImpl implements ReplyDAO
 
         return result;
     }
-
-
-//    private List<PostDTO> createListOfPostDTOfromResultSet( ResultSet rs )
-//    {
-//        if( rs == null ) return new ArrayList<>();
-//
-//        List<PostDTO> result = new ArrayList<>();
-//
-//        try
-//        {
-//            while( rs.next() )
-//            {
-//                result.add( new PostDTO( rs.getInt( "id" ),
-//                                         rs.getInt( "author_id" ),
-//                                         rs.getString( "message" ),
-//                                         rs.getTimestamp( "timestamp" ).toLocalDateTime(),
-//                                         new ArrayList<>(),
-//                                         new ArrayList<>() ) );
-//            }
-//        }
-//        catch( SQLException sqlex )
-//        {
-//            sqlex.printStackTrace();
-//        }
-//
-//        return result;
-//    }
-
-
-//    @Override
-//    public int deleteReply( int activeUserId, int replyId )
-//    {
-//        int result = 0;
-//
-//        final String query = "DELETE FROM posts WHERE author_id = ? AND id = ?";
-//
-//        try( Connection conn = MySQLConnection.getConnection();
-//             PreparedStatement pstmt = conn.prepareStatement( query ))
-//        {
-//            pstmt.setInt( 1, activeUserId );
-//            pstmt.setInt( 2, replyId );
-//
-//            result = pstmt.executeUpdate();
-//        }
-//        catch( SQLException sqlex )
-//        {
-//            sqlex.printStackTrace();
-//        }
-//
-//        return result;
-//    }
 }

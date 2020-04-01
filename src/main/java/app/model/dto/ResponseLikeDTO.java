@@ -1,23 +1,17 @@
 package app.model.dto;
 
 
-import javax.validation.constraints.Positive;
-
-
 public class ResponseLikeDTO
 {
-    @Positive
     private int userId;
-
-    @Positive
     private int postId;
 
 
     public ResponseLikeDTO() {}
 
 
-    public ResponseLikeDTO( @Positive int userId,
-                            @Positive int postId )
+    public ResponseLikeDTO( int userId,
+                            int postId )
     {
         this.userId = userId;
         this.postId = postId;

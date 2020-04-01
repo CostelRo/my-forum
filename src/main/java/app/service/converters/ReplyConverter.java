@@ -36,25 +36,8 @@ public class ReplyConverter
                                      reply.getTimestamp(),
                                      ReplyConverter.fromListOfDTOtoListOfResponseDTO( reply.getReplies() ),
                                      reply.getLikes(),
-//                                     LikeConverter.fromListOfDTOtoListOfResponseDTO( reply.getLikes() ),
                                      reply.getParentPostId() );
     }
-
-
-//    public static List<Integer> getListOfIDsFromListOfPostDTO( List<PostDTO> posts )
-//    {
-//        List<Integer> result = new ArrayList<>();
-//
-//        if( posts != null )
-//        {
-//            for( PostDTO post : posts )
-//            {
-//                if( post != null ) result.add( post.getId() );
-//            }
-//        }
-//
-//        return result;
-//    }
 
 
     public static List<ResponseReplyDTO> fromListOfDTOtoListOfResponseDTO( List<ReplyDTO> replies )
@@ -71,7 +54,6 @@ public class ReplyConverter
                                                   reply.getTimestamp(),
                                                   ReplyConverter.fromListOfDTOtoListOfResponseDTO( reply.getReplies() ),
                                                   reply.getLikes(),
-//                                                  LikeConverter.fromListOfDTOtoListOfResponseDTO( reply.getLikes() ),
                                                   reply.getParentPostId() ) );
             }
         }

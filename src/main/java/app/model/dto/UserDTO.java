@@ -1,51 +1,32 @@
 package app.model.dto;
 
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
 public class UserDTO
 {
-    @PositiveOrZero
     private int id;
-
-    @NotNull
     private String username;
-
-    @NotNull
     private String password;
-
-    @NotNull
-    @Email
     private String email;
-
-    @NotNull
     private String firstName;
-
-    @NotNull
     private String lastName;
-
-    @NotNull
     private List<PostDTO> posts;
-
-    @NotNull
     private List<String> follows;  // list of followed forum user names
 
 
     public UserDTO() {}
 
 
-    public UserDTO( @PositiveOrZero int id,
-                    @NotNull String username,
-                    @NotNull String password,
-                    @NotNull @Email String email,
-                    @NotNull String firstName,
-                    @NotNull String lastName,
-                    @NotNull List<PostDTO> posts,
-                    @NotNull List<String> follows )
+    public UserDTO( int id,
+                    String username,
+                    String password,
+                    String email,
+                    String firstName,
+                    String lastName,
+                    List<PostDTO> posts,
+                    List<String> follows )
     {
         this.id = id;
         this.username = username;

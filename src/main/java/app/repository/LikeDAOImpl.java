@@ -10,21 +10,19 @@ import org.springframework.stereotype.Repository;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 
 @Repository
 public class LikeDAOImpl implements LikeDAO
 {
     @Override
-    public LikeDTO addLike( LikeDTO newLike )
+    public LikeDTO addLike( LikeDTO newLike ) throws SQLIntegrityConstraintViolationException
     {
         LikeDTO result = null;
 
         // authors cannot add a like to their own posts
-        final String query = "INSERT INTO likes (user_id, post_id) "
-                             + "SELECT ?, ? "
-                             + "WHERE ? IN (SELECT id FROM users) AND ? IN (SELECT id FROM posts) "
-                             + "AND NOT EXISTS (SELECT author_id, id FROM posts WHERE author_id = ? AND id = ?)";
+        final String query = "INSERT INTO likes (user_id, post_id) VALUES (?, ?)";
 
         try( Connection conn = MySQLConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement( query ) )
@@ -32,13 +30,13 @@ public class LikeDAOImpl implements LikeDAO
             // insert the new post
             pstmt.setInt( 1, newLike.getUserId() );
             pstmt.setInt( 2, newLike.getPostId() );
-            pstmt.setInt( 3, newLike.getUserId() );
-            pstmt.setInt( 4, newLike.getPostId() );
-            pstmt.setInt( 5, newLike.getUserId() );
-            pstmt.setInt( 6, newLike.getPostId() );
             int status = pstmt.executeUpdate();
 
             if( status == 1 ) { result = newLike; }
+        }
+        catch( SQLIntegrityConstraintViolationException sqlcvex )
+        {
+            throw sqlcvex;
         }
         catch( SQLException sqlex )
         {

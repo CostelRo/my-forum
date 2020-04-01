@@ -7,13 +7,12 @@ import app.model.dto.UserDTO;
 import app.repository.api.UserDAO;
 import app.repository.exceptions.ActiveUsersCannotFollowThemselves;
 import app.repository.exceptions.ActiveUsersCannotUnfollowThemselves;
-import app.repository.exceptions.DuplicateEntryForUniqueDBRecord;
 import app.repository.exceptions.UserNotFound;
 import app.service.converters.UserConverter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class UserService
     }
 
 
-    public ResponseUserDTO registerNewUser( RequestUserDTO newUser ) throws DuplicateEntryForUniqueDBRecord
+    public ResponseUserDTO registerNewUser( RequestUserDTO newUser ) throws SQLIntegrityConstraintViolationException
     {
         if( newUser == null ) throw new IllegalArgumentException( "Missing User object!" );
         if( isMissingMandatoryUserData( newUser ) ) throw new IllegalArgumentException( "User mandatory data missing." );
@@ -76,16 +75,10 @@ public class UserService
 
 
     public int followUser( int activeUserId, int followedId )
-                           throws UserNotFound, ActiveUsersCannotFollowThemselves
+                           throws UserNotFound, ActiveUsersCannotFollowThemselves, SQLIntegrityConstraintViolationException
     {
-        if( activeUserId <= 0 || followedId <= 0 )
-        {
-            throw new IllegalArgumentException( "Both user IDs must be valid." );
-        }
-        if( activeUserId == followedId )
-        {
-            throw new ActiveUsersCannotFollowThemselves( "Users cannot follow themselves." );
-        }
+        if( activeUserId <= 0 || followedId <= 0 ) { throw new UserNotFound( "Both user IDs must be valid." ); }
+        if( activeUserId == followedId ) { throw new ActiveUsersCannotFollowThemselves( "Users cannot follow themselves." ); }
 
         return userDAO.followUser( activeUserId, followedId );
     }
@@ -93,17 +86,10 @@ public class UserService
 
     public int unfollowUser( int activeUserId, int followedId ) throws ActiveUsersCannotUnfollowThemselves
     {
-        if( activeUserId <= 0 || followedId <= 0 )
-        {
-            throw new IllegalArgumentException( "Both user IDs must be valid." );
-        }
-        if( activeUserId == followedId )
-        {
-            throw new ActiveUsersCannotUnfollowThemselves( "Users cannot un-follow themselves." );
-        }
+        if( activeUserId <= 0 || followedId <= 0 ) { throw new IllegalArgumentException( "Both user IDs must be valid." ); }
+        if( activeUserId == followedId ) { throw new ActiveUsersCannotUnfollowThemselves( "Users cannot un-follow themselves." ); }
 
-        return userDAO.unfollowUser( activeUserId, followedId ) == 1
-               ? followedId
-               : 0;
+        return userDAO.unfollowUser( activeUserId, followedId ) == 1 ? followedId
+                                                                     : 0;
     }
 }

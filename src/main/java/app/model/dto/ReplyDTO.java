@@ -1,28 +1,25 @@
 package app.model.dto;
 
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.List;
 
 
 public class ReplyDTO extends PostDTO
 {
-    @Positive
     private int parentPostId;
 
 
     public ReplyDTO() {}
 
 
-    public ReplyDTO( @Positive int id,
-                     @Positive int authorID,
-                     @NotNull String message,
-                     @NotNull LocalDateTime timestamp,
-                     @NotNull List<ReplyDTO> replies,
-                     @NotNull List<String> likes,
-                     @Positive int parentPostId )
+    public ReplyDTO( int id,
+                     int authorID,
+                     String message,
+                     LocalDateTime timestamp,
+                     List<ReplyDTO> replies,
+                     List<String> likes,
+                     int parentPostId )
     {
         super( id, authorID, message, timestamp, replies, likes );
         this.parentPostId = parentPostId;

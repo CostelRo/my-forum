@@ -13,7 +13,7 @@ public class RequestLikeDTO
     public RequestLikeDTO() {}
 
 
-    public RequestLikeDTO( @Positive int postId )
+    public RequestLikeDTO( int postId )
     {
         this.postId = postId;
     }

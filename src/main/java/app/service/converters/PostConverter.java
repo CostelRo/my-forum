@@ -37,7 +37,6 @@ public class PostConverter
                                     post.getTimestamp(),
                                     ReplyConverter.fromListOfDTOtoListOfResponseDTO( post.getReplies() ),
                                     post.getLikes() );
-//                                    LikeConverter.fromListOfDTOtoListOfResponseDTO( post.getLikes() ) );
     }
 
 
@@ -75,9 +74,7 @@ public class PostConverter
                                                       reply.getTimestamp(),
                                                       ReplyConverter.fromListOfDTOtoListOfResponseDTO( reply.getReplies() ),
                                                       post.getLikes(),
-//                                                      LikeConverter.fromListOfDTOtoListOfResponseDTO ( reply.getLikes() ),
                                                       reply.getParentPostId() ) );
-                    // TODO add replies & likes!
                 }
                 else
                 {
@@ -87,7 +84,6 @@ public class PostConverter
                                                      post.getTimestamp(),
                                                      ReplyConverter.fromListOfDTOtoListOfResponseDTO( post.getReplies() ),
                                                      post.getLikes() ) );
-//                                                     LikeConverter.fromListOfDTOtoListOfResponseDTO( post.getLikes() ) ) );
                 }
             }
         }

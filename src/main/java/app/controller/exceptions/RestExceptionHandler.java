@@ -17,14 +17,14 @@ public class RestExceptionHandler
     @ExceptionHandler( MethodArgumentNotValidException.class )
     protected ResponseEntity<Object> handleMethodArgumentNotValid( @NotNull MethodArgumentNotValidException ex )
     {
-//        String[] fullErrorMessage = ex.getMessage().split( "default message" );
-//        String simpleErrorMessage = fullErrorMessage[2].replaceAll( "[\\[\\]]", "" );
-//
-//        return new ResponseEntity<>( simpleErrorMessage, HttpStatus.FORBIDDEN );
-
         System.out.println( "\n>>>> handleMethodArgumentNotValid: ..." );
 
-        return new ResponseEntity<>( ex.getMessage(), HttpStatus.FORBIDDEN );
+        String[] fullErrorMessage = ex.getMessage().split( "default message" );
+        String simpleErrorMessage = fullErrorMessage[2].replaceAll( "[\\[\\]]", "" );
+
+        return new ResponseEntity<>( simpleErrorMessage, HttpStatus.FORBIDDEN );
+
+//        return new ResponseEntity<>( ex.getMessage(), HttpStatus.FORBIDDEN );
     }
 
 

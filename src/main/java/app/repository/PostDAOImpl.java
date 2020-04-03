@@ -303,20 +303,39 @@ public class PostDAOImpl implements PostDAO
     }
 
 
+    /**
+     * Deleted o post from database. Also deletes its associated replies.
+     * @param activeUserId  the database ID of the current user
+     * @param postId        the ID pf the post to be deleted
+     * @return              the number of database records deleted, or 0 if none
+     */
     @Override
     public int deletePost( int activeUserId, int postId )
     {
         int result = 0;
 
-        final String query = "DELETE FROM posts WHERE author_id = ? AND id = ?";
+        // check if active user is the author of indicated post and thus has the right to delete it
+        final String sqlCheckPostOwnership = "SELECT author_id FROM posts WHERE author_id = ? AND id = ?";
+        // delete the indicated post and its replies from database
+        final String sqlDeletePostAndReplies = "DELETE FROM posts WHERE id = ? OR parent_post_id = ?";
 
         try( Connection conn = MySQLConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement( query ))
+             PreparedStatement pstmtOwnership = conn.prepareStatement( sqlCheckPostOwnership );
+             PreparedStatement pstmtDeletePost = conn.prepareStatement( sqlDeletePostAndReplies ) )
         {
-            pstmt.setInt( 1, activeUserId );
-            pstmt.setInt( 2, postId );
+            pstmtOwnership.setInt( 1, activeUserId );
+            pstmtOwnership.setInt( 2, postId );
+            ResultSet owner = pstmtOwnership.executeQuery();
 
-            result = pstmt.executeUpdate();
+            if( owner.isBeforeFirst() )
+            {
+                pstmtDeletePost.setInt( 1, postId );
+                pstmtDeletePost.setInt( 2, postId );
+
+                result = pstmtDeletePost.executeUpdate();
+            }
+
+            owner.close();
         }
         catch( SQLException sqlex )
         {

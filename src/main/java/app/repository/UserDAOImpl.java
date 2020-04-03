@@ -337,4 +337,29 @@ public class UserDAOImpl implements UserDAO
 
         return result;
     }
+
+
+    @Override
+    public int unregisterUser( int activeUserId )
+    {
+        int result = 0;
+
+        // deleting a user also deletes their activity from database (posts, likes and followed-users data),
+        // due to the declared foreign keys in database tables having their referential action set "ON DELETE CASCADE"
+        // (otherwise we should first delete the user activity and only after that delete the user)
+        final String query = "DELETE FROM users WHERE id = ?";
+
+        try( Connection conn = MySQLConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement( query ) )
+        {
+            pstmt.setInt( 1, activeUserId );
+            pstmt.executeUpdate();
+        }
+        catch( SQLException sqlex )
+        {
+            sqlex.printStackTrace();
+        }
+
+        return result;
+    }
 }

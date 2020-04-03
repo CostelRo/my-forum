@@ -95,4 +95,13 @@ public class UserController
             return new ResponseEntity<>( ex.getMessage(), HttpStatus.FORBIDDEN );
         }
     }
+
+
+    @RequestMapping( value = "/", method = RequestMethod.DELETE, consumes = "application/json" )
+    public ResponseEntity<Object> unregister( @Valid @RequestHeader @Positive int activeUserId )
+    {
+        userService.unregisterUser( activeUserId );
+
+        return new ResponseEntity<>( activeUserId, HttpStatus.NO_CONTENT );
+    }
 }

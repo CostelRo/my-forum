@@ -73,8 +73,7 @@ public class PostService
             throw new IllegalArgumentException( "User-ID and post-ID must be valid." );
         }
 
-        return postDAO.deletePost( activeUserId, postId ) == 1
-               ? postId
-               : 0;
+        return (postDAO.deletePost( activeUserId, postId ) > 0) ? postId
+                                                                : 0;
     }
 }

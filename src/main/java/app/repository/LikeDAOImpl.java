@@ -47,6 +47,14 @@ public class LikeDAOImpl implements LikeDAO
     }
 
 
+    /**
+     * Deletes a particular like from database.
+     * NOTE: Likes associated with a post ID are automatically deleted from database when that Post is deleted,
+     * due to the declared foreign key in database table having referential action set "ON DELETE CASCADE".
+     * @param activeUserId  the database ID of the active user
+     * @param postId        the database ID of the post to which the like to be deleted is associated with
+     * @return              the number of database records deleted, or 0 if none
+     */
     @Override
     public int deleteLike( int activeUserId, int postId )
     {

@@ -21,4 +21,6 @@ public interface UserDAO
     int followUser( int activeUserId, int followedId ) throws UserNotFound, SQLIntegrityConstraintViolationException;
 
     int unfollowUser( int activeUserId, int followedId );
+
+    int unregisterUser( int activeUserId );
 }

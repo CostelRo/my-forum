@@ -92,4 +92,13 @@ public class UserService
         return userDAO.unfollowUser( activeUserId, followedId ) == 1 ? followedId
                                                                      : 0;
     }
+
+
+    public int unregisterUser( int activeUserId )
+    {
+        if( activeUserId <= 0 ) { throw new IllegalArgumentException( "User ID must be valid." ); }
+
+        return userDAO.unregisterUser( activeUserId ) > 0 ? activeUserId
+                                                          : 0;
+    }
 }
